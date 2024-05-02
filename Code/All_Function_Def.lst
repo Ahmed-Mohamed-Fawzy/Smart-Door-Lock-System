@@ -1,0 +1,373 @@
+C51 COMPILER V9.60.0.0   ALL_FUNCTION_DEF                                                  03/16/2024 07:07:52 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE ALL_FUNCTION_DEF
+OBJECT MODULE PLACED IN .\Objects\All_Function_Def.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE All_Function_Def.c OMF2 OPTIMIZE(8,SPEED) BROWSE DEBUG PRINT(.\Listings\
+                    -All_Function_Def.lst) TABS(2) OBJECT(.\Objects\All_Function_Def.obj)
+
+line level    source
+
+   1          #include <All_Function_Proto.h>
+   2          
+   3          unsigned char gTH1_value = 0xF9; 
+   4          unsigned char gTL1_value = 0X34; 
+   5          
+   6          /*Delay Functions Definations*/
+   7          
+   8          void delayms (unsigned int n)
+   9          {
+  10   1        unsigned int i;
+  11   1        unsigned int j;
+  12   1        
+  13   1        for(i=0;i<n;i++)
+  14   1        {
+  15   2          for(j=0;j<1275;j++);
+  16   2        }
+  17   1      }
+  18          
+  19          /*=============================================================================================*/
+  20          
+  21          /*LCD Functions Definations*/
+  22          
+  23          void LCD_init(void)
+  24          {
+  25   1        /*Configure the Direction of Rs Pin to output pin*/
+  26   1        LCD_RS = 0;
+  27   1        /*Configure the Direction of En Pin to output pin*/
+  28   1        LCD_En = 0;
+  29   1        /*This Delay 20m sec needed from datasheet*/
+  30   1        delayms(20);
+  31   1        /*Set the LCD_DATA_PORT_ID to output port */
+  32   1        LCD_DATA_PORT_ID = 0x00;
+  33   1        /* use 2-lines LCD + 8-bits Data Mode + 5*7 dot display Mode */
+  34   1        LCD_sendCommand(LCD_TWO_LINES_EIGHT_BITS_MODE);
+  35   1        /* cursor off */
+  36   1        LCD_sendCommand(LCD_CURSOR_OFF); 
+  37   1        /* clear LCD at the beginning */
+  38   1        LCD_sendCommand(LCD_CLEAR_COMMAND); 
+  39   1      }
+  40          
+  41          void LCD_sendCommand(unsigned char command)
+  42          {
+  43   1        /*
+  44   1          To send command on LCD you should put:
+  45   1          1- Rs to 0 
+  46   1          2- En to 1
+  47   1          you should make a delay 1m sec as written datasheet
+  48   1        */
+  49   1        LCD_RS = 0;
+  50   1        delayms(1);
+  51   1        LCD_En = 1;
+  52   1        delayms(1);
+  53   1        /*
+  54   1          To send command on LCD you should put:
+C51 COMPILER V9.60.0.0   ALL_FUNCTION_DEF                                                  03/16/2024 07:07:52 PAGE 2   
+
+  55   1          1- the command you need on Lcd Data Port  
+  56   1          2- En to 0
+  57   1          you should make a delay 1m sec as written datasheet
+  58   1        */
+  59   1        LCD_DATA_PORT_ID = command;
+  60   1        delayms(1);
+  61   1        LCD_En = 0;
+  62   1        delayms(1);
+  63   1      }
+  64          
+  65          void LCD_displayCharacter(unsigned char my_data)
+  66          {
+  67   1      /*
+  68   1          To send command on LCD you should put:
+  69   1          1- Rs to 1 
+  70   1          2- En to 1
+  71   1          you should make a delay 1m sec as written datasheet
+  72   1        */
+  73   1        LCD_RS = 1;
+  74   1        delayms(1);
+  75   1        LCD_En = 1;
+  76   1        delayms(1);
+  77   1        
+  78   1        /*
+  79   1          To send data_ on LCD you should put:
+  80   1          1- the command you need on Lcd Data Port  
+  81   1          2- En to 0
+  82   1          you should make a delay 1m sec as written datasheet
+  83   1        */  
+  84   1        LCD_DATA_PORT_ID = my_data;
+  85   1        delayms(1);
+  86   1        LCD_En = 0;
+  87   1        delayms(1);
+  88   1      }
+  89          
+  90          void LCD_displayString(const char *Str)
+  91          {
+  92   1        unsigned char i;
+  93   1        for(i=0; Str[i] != '\0';i++)
+  94   1          {
+  95   2            LCD_displayCharacter(Str[i]);
+  96   2          }
+  97   1      }
+  98          
+  99          void LCD_clearScreen(void)
+ 100          {
+ 101   1        LCD_sendCommand(LCD_CLEAR_COMMAND); 
+ 102   1      }
+ 103          
+ 104          void LCD_moveCursor(unsigned char row,unsigned char col)
+ 105          {
+ 106   1          unsigned char  memory_address;
+ 107   1        
+ 108   1        /* Calculate the required address in the LCD DDRAM */
+ 109   1        switch(row)
+ 110   1        {
+ 111   2          case 0:
+ 112   2            memory_address=col;
+ 113   2              break;
+ 114   2          case 1:
+ 115   2            memory_address=col+0x40;
+ 116   2              break;
+C51 COMPILER V9.60.0.0   ALL_FUNCTION_DEF                                                  03/16/2024 07:07:52 PAGE 3   
+
+ 117   2          case 2:
+ 118   2            memory_address=col+0x10;
+ 119   2              break;
+ 120   2          case 3:
+ 121   2            memory_address=col+0x50;
+ 122   2              break;
+ 123   2        }         
+ 124   1        /* Move the LCD cursor to this specific address */
+ 125   1        LCD_sendCommand(memory_address | LCD_SET_CURSOR_LOCATION);
+ 126   1      }
+ 127          
+ 128          /*=============================================================================================*/
+ 129          
+ 130          /*Keypad Function Definations*/
+ 131          
+ 132          unsigned char  KEYPAD_getPressedKey(void)
+ 133          {
+ 134   1        unsigned char row;
+ 135   1        unsigned char col;
+ 136   1        
+ 137   1        /*
+ 138   1        Set all pins in the port sa input pin so we should assign 1 to each pin,
+ 139   1        for looping on the port in infinite loop to get which key was pressed.
+ 140   1        */
+ 141   1        KEYPAD_ROW_PORT = 0xFF; 
+ 142   1        
+ 143   1        for(;;)
+ 144   1        {
+ 145   2          /*Loop on Rows*/
+ 146   2          for(row=0 ; row<KEYPAD_NUM_ROWS ; row++) 
+ 147   2          {
+ 148   3            // each time make a pin of row output pin
+ 149   3            KEYPAD_ROW_PORT &= ~(1<<row);
+ 150   3            
+ 151   3            for(col=0 ; col<KEYPAD_NUM_ROWS ; col++) 
+ 152   3            {
+ 153   4              if((KEYPAD_COL_PORT & (1<<col)) == KEYPAD_BUTTON_PRESSED)
+ 154   4              {
+ 155   5                return KEYPAD_4x4_adjustKeyNumber((row*KEYPAD_NUM_COLS)+col+1);
+ 156   5              }
+ 157   4            }
+ 158   3            /*Before Finish this iteration you should return the pin to input again*/
+ 159   3            KEYPAD_ROW_PORT |= (1<<row);
+ 160   3            /*This Delay to important*/
+ 161   3            delayms(50);
+ 162   3          }
+ 163   2        }
+ 164   1        
+ 165   1      }
+ 166          
+ 167          unsigned char KEYPAD_4x4_adjustKeyNumber(unsigned char button_number)
+ 168          {
+ 169   1        unsigned char keypad_button = 0;
+ 170   1        switch(button_number)
+ 171   1        {
+ 172   2          case 1: keypad_button = 7;
+ 173   2              break;
+ 174   2          case 2: keypad_button = 8;
+ 175   2              break;
+ 176   2          case 3: keypad_button = 9;
+ 177   2              break;
+ 178   2          case 4: keypad_button = '%';
+C51 COMPILER V9.60.0.0   ALL_FUNCTION_DEF                                                  03/16/2024 07:07:52 PAGE 4   
+
+ 179   2              break;
+ 180   2          case 5: keypad_button = 4;
+ 181   2              break;
+ 182   2          case 6: keypad_button = 5;
+ 183   2              break;
+ 184   2          case 7: keypad_button = 6;
+ 185   2              break;
+ 186   2          case 8: keypad_button = '*';
+ 187   2              break;    
+ 188   2          case 9: keypad_button = 1;
+ 189   2              break;
+ 190   2          case 10: keypad_button = 2;
+ 191   2              break;
+ 192   2          case 11: keypad_button = 3;
+ 193   2              break;
+ 194   2          case 12: keypad_button = '-'; 
+ 195   2              break;
+ 196   2          case 13: keypad_button = 13; 
+ 197   2              break;      
+ 198   2          case 14: keypad_button = 0;
+ 199   2              break;
+ 200   2          case 15: keypad_button = '='; 
+ 201   2              break;
+ 202   2          case 16: keypad_button = '+';
+ 203   2              break;
+ 204   2          default: keypad_button = button_number;
+ 205   2              break;
+ 206   2        }
+ 207   1        return keypad_button;
+ 208   1      } 
+ 209          /*==================================================================================*/
+ 210          
+ 211          /*Servo Motor Functions*/
+ 212            
+ 213            /*
+ 214            Value should be passed to timer 1 to rotate servo:  
+ 215              1- For Rotate 0    -> we need  1.5   ms = 0XFA24
+ 216              2- For Rotate 90   -> we need  1.74  ms = 0XF934
+ 217              3- For Rotate 180  -> we need  2     ms = 0XF830
+ 218              4- For Rotate -90  -> we need  1.24  ms = 0XFB28
+ 219              5- For Rotate -180 -> we need  0.98  ms = 0XFC2C
+ 220            */
+ 221          
+ 222          void SERVO_init(void)
+ 223          {
+ 224   1        /*give interrupt_ each 50 m sec*/
+ 225   1        TMOD = 0X10;
+ 226   1        TH1  = gTH1_value;
+ 227   1        TL1  = gTL1_value;
+ 228   1        ET1  = 1;
+ 229   1      }
+ 230          
+ 231          void SERVO_rotateDegree(unsigned char TH1_value, unsigned char TL1_value)
+ 232          {
+ 233   1        gTH1_value = TH1_value;
+ 234   1        gTL1_value = TL1_value;
+ 235   1      } 
+ 236          
+ 237          void SERVO_ISR (void) interrupt 3 
+ 238          {
+ 239   1          servo = ~servo;
+ 240   1          TF1   = 0;
+C51 COMPILER V9.60.0.0   ALL_FUNCTION_DEF                                                  03/16/2024 07:07:52 PAGE 5   
+
+ 241   1          TH1  = gTH1_value;
+ 242   1          TL1  = gTL1_value;
+ 243   1      }
+ 244          
+ 245          /*==================================================================================*/
+ 246          
+ 247          /* IR, Buazzer, and Three Led Functions*/
+ 248          
+ 249          
+ 250          unsigned char IR_readStatus(void)
+ 251          {
+ 252   1        /*Local Variable Store the Value that IR read*/
+ 253   1        unsigned char IR_status;
+ 254   1        /* Define IR pin as Input Pin*/
+ 255   1        IR_pin = 1;
+ 256   1        
+ 257   1        if(IR_pin == IR_DETECT)
+ 258   1          {
+ 259   2            IR_status = 1;
+ 260   2          }
+ 261   1          else if(IR_pin == IR_SLEEP)
+ 262   1          {
+ 263   2            IR_status = 0;
+ 264   2          } 
+ 265   1          else
+ 266   1          {
+ 267   2            /*No Action Required*/
+ 268   2          }
+ 269   1          
+ 270   1          return IR_status ;
+ 271   1      }
+ 272          
+ 273          void BUZZER_status(unsigned char status)
+ 274          {
+ 275   1        if(status == BUZZER_ON)
+ 276   1          {
+ 277   2            Buzzer = BUZZER_ON;
+ 278   2          }
+ 279   1          else if(status == BUZZER_OFF)
+ 280   1          {
+ 281   2            Buzzer = BUZZER_OFF;
+ 282   2          } 
+ 283   1          else
+ 284   1          {
+ 285   2            /*No Action Required*/
+ 286   2          }
+ 287   1      }
+ 288          
+ 289          void RED_ledStatus(unsigned char status)
+ 290          {
+ 291   1          if(status == LED_ON)
+ 292   1          {
+ 293   2            R_led = LED_ON;
+ 294   2          }
+ 295   1          else if(status == LED_OFF)
+ 296   1          {
+ 297   2            R_led = LED_OFF;
+ 298   2          } 
+ 299   1          else
+ 300   1          {
+ 301   2            /*No Action Required*/
+ 302   2          }
+C51 COMPILER V9.60.0.0   ALL_FUNCTION_DEF                                                  03/16/2024 07:07:52 PAGE 6   
+
+ 303   1      }
+ 304          
+ 305          void YELLOW_ledStatus(unsigned char status)
+ 306          {
+ 307   1        if(status == LED_ON)
+ 308   1          {
+ 309   2            Y_led = LED_ON;
+ 310   2          }
+ 311   1          else if(status == LED_OFF)
+ 312   1          {
+ 313   2            Y_led = LED_OFF;
+ 314   2          } 
+ 315   1          else
+ 316   1          {
+ 317   2            /*No Action Required*/
+ 318   2          }
+ 319   1      }
+ 320          
+ 321          void GREEN_ledStatus(unsigned char status)
+ 322          {
+ 323   1        if(status == LED_ON)
+ 324   1          {
+ 325   2            G_led = LED_ON;
+ 326   2          }
+ 327   1          else if(status == LED_OFF)
+ 328   1          {
+ 329   2            G_led = LED_OFF;
+ 330   2          } 
+ 331   1          else
+ 332   1          {
+ 333   2            /*No Action Required*/
+ 334   2          }
+ 335   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    557    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      2       7
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
