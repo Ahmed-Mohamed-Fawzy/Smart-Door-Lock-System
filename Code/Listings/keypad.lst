@@ -1,0 +1,190 @@
+C51 COMPILER V9.60.0.0   KEYPAD                                                            04/27/2024 19:56:51 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE KEYPAD
+OBJECT MODULE PLACED IN .\Objects\keypad.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE keypad.c OMF2 OPTIMIZE(8,SPEED) BROWSE DEBUG PRINT(.\Listings\keypad.lst
+                    -) TABS(2) OBJECT(.\Objects\keypad.obj)
+
+line level    source
+
+   1          /***********************************************************************
+   2          *                                                                      *           
+   3          * File Name: keypad.c                                                  *
+   4          *                                                                      *
+   5          * Subject: the keypad source file contains the keypad functions        *                                                             
+   6          *                                                                      *
+   7          * Date: 15-4-2024                                                      *
+   8          *                                                                      *
+   9          * Created By: Group 1 -> Embedded System Course                        *                       
+  10          *                                                                      *
+  11          ***********************************************************************/
+  12          
+  13          #include <keypad.h>
+  14          #include <reg51.h>
+  15          
+  16          /*Keypad Function Definations*/
+  17          unsigned char  KEYPAD_getPressedKey(void)
+  18          {
+  19   1        
+  20   1        
+  21   1        for(;;)
+  22   1        {
+  23   2        
+  24   2        KEYPAD_COL_Pin_1 = 1;
+  25   2        KEYPAD_COL_Pin_2 = 1;
+  26   2        KEYPAD_COL_Pin_3 = 1;
+  27   2        KEYPAD_COL_Pin_4 = 1;
+  28   2        delayms(50);
+  29   2          
+  30   2        KEYPAD_ROW_Pin_1 = 0;
+  31   2        KEYPAD_ROW_Pin_2 = 1;
+  32   2        KEYPAD_ROW_Pin_3 = 1;
+  33   2        KEYPAD_ROW_Pin_4 = 1;
+  34   2        
+  35   2        if(KEYPAD_COL_Pin_1==0)
+  36   2        {
+  37   3          delayms(50);
+  38   3          while(KEYPAD_COL_Pin_1==0);
+  39   3          return '1';
+  40   3        }
+  41   2        
+  42   2        if(KEYPAD_COL_Pin_2==0)
+  43   2        {
+  44   3          delayms(50);
+  45   3          while(KEYPAD_COL_Pin_2==0);
+  46   3          return '2';
+  47   3        }
+  48   2        if(KEYPAD_COL_Pin_3==0)
+  49   2        {
+  50   3          delayms(50);
+  51   3          while(KEYPAD_COL_Pin_3==0);
+  52   3          return '3';
+  53   3        }
+  54   2        if(KEYPAD_COL_Pin_4==0)
+C51 COMPILER V9.60.0.0   KEYPAD                                                            04/27/2024 19:56:51 PAGE 2   
+
+  55   2        {
+  56   3          delayms(50);
+  57   3          while(KEYPAD_COL_Pin_4==0);
+  58   3          return 'A';
+  59   3        }
+  60   2        
+  61   2        KEYPAD_ROW_Pin_1=1;
+  62   2        KEYPAD_ROW_Pin_2=0;
+  63   2        KEYPAD_ROW_Pin_3=1;
+  64   2        KEYPAD_ROW_Pin_4=1;
+  65   2        
+  66   2        if(KEYPAD_COL_Pin_1==0)
+  67   2        {
+  68   3          delayms(50);
+  69   3          while(KEYPAD_COL_Pin_1==0);
+  70   3          return '4';
+  71   3        }
+  72   2        if(KEYPAD_COL_Pin_2==0)
+  73   2        {
+  74   3          delayms(50);
+  75   3          while(KEYPAD_COL_Pin_2==0);
+  76   3          return '5';
+  77   3        }
+  78   2        
+  79   2        if(KEYPAD_COL_Pin_3==0)
+  80   2        {
+  81   3          delayms(50);
+  82   3          while(KEYPAD_COL_Pin_3==0);
+  83   3          return '6';
+  84   3        }
+  85   2        
+  86   2        if(KEYPAD_COL_Pin_4==0)
+  87   2        {
+  88   3          delayms(50);
+  89   3          while(KEYPAD_COL_Pin_4==0);
+  90   3          return 'B';
+  91   3        }
+  92   2        
+  93   2        KEYPAD_ROW_Pin_1=1;
+  94   2        KEYPAD_ROW_Pin_2=1;
+  95   2        KEYPAD_ROW_Pin_3=0;
+  96   2        KEYPAD_ROW_Pin_4=1;
+  97   2        
+  98   2        if(KEYPAD_COL_Pin_1==0)
+  99   2        {
+ 100   3          delayms(50);
+ 101   3          while(KEYPAD_COL_Pin_1==0);
+ 102   3          return '7';
+ 103   3        }
+ 104   2        
+ 105   2        if(KEYPAD_COL_Pin_2==0)
+ 106   2        {
+ 107   3          delayms(50);
+ 108   3          while(KEYPAD_COL_Pin_2==0);
+ 109   3          return '8';
+ 110   3        }
+ 111   2        
+ 112   2        if(KEYPAD_COL_Pin_3==0)
+ 113   2        {
+ 114   3          delayms(50);
+ 115   3          while(KEYPAD_COL_Pin_3==0);
+ 116   3          return '9';
+C51 COMPILER V9.60.0.0   KEYPAD                                                            04/27/2024 19:56:51 PAGE 3   
+
+ 117   3        }
+ 118   2        
+ 119   2        if(KEYPAD_COL_Pin_4==0)
+ 120   2        {
+ 121   3          delayms(50);
+ 122   3          while(KEYPAD_COL_Pin_4==0);
+ 123   3          return 'C';
+ 124   3        }
+ 125   2        
+ 126   2        KEYPAD_ROW_Pin_1=1;
+ 127   2        KEYPAD_ROW_Pin_2=1;
+ 128   2        KEYPAD_ROW_Pin_3=1;
+ 129   2        KEYPAD_ROW_Pin_4=0;
+ 130   2        
+ 131   2        if(KEYPAD_COL_Pin_1==0)
+ 132   2        {
+ 133   3          delayms(50);
+ 134   3          while(KEYPAD_COL_Pin_1==0);
+ 135   3          return '*';
+ 136   3        }
+ 137   2        
+ 138   2        if(KEYPAD_COL_Pin_2==0)
+ 139   2        {
+ 140   3          delayms(50);
+ 141   3          while(KEYPAD_COL_Pin_2==0);
+ 142   3          return '0';
+ 143   3        }
+ 144   2        
+ 145   2        if(KEYPAD_COL_Pin_3==0)
+ 146   2        {
+ 147   3          delayms(50);
+ 148   3          while(KEYPAD_COL_Pin_3==0);
+ 149   3          return '#';
+ 150   3        }
+ 151   2        if(KEYPAD_COL_Pin_4==0)
+ 152   2        {
+ 153   3          delayms(50);
+ 154   3          while(KEYPAD_COL_Pin_4==0);
+ 155   3          return 'D';
+ 156   3        }
+ 157   2        }
+ 158   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    306    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

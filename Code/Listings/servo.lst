@@ -1,0 +1,87 @@
+C51 COMPILER V9.60.0.0   SERVO                                                             04/27/2024 19:01:54 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE SERVO
+OBJECT MODULE PLACED IN .\Objects\servo.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE servo.c OMF2 OPTIMIZE(8,SPEED) BROWSE DEBUG PRINT(.\Listings\servo.lst) 
+                    -TABS(2) OBJECT(.\Objects\servo.obj)
+
+line level    source
+
+   1          /***********************************************************************
+   2          *                                                                      *           
+   3          * File Name: servo.c                                                   *
+   4          *                                                                      *
+   5          * Subject: the servo source file contains the servo functions          *                                                             *
+   6          *                                                                      *
+   7          * Date: 15-4-2024                                                      *
+   8          *                                                                      *
+   9          * Created By: Group 1 -> Embedded System Course                        *                       
+  10          *                                                                      *
+  11          ***********************************************************************/
+  12          
+  13          #include <servo.h>
+  14          #include <reg51.h>
+  15          
+  16          sbit servo  = P3^4;
+  17          unsigned char gTH0_value = 0XF9 ; 
+  18          unsigned char gTL0_value  = 0X34; 
+  19          
+  20          /*Servo Motor Functions*/
+  21            
+  22            /*
+  23            Value should be passed to timer 0 to rotate servo:  
+  24              1- For Rotate 0    -> we need  1.5   ms = 0XFA24
+  25              2- For Rotate 90   -> we need  1.74  ms = 0XF934
+  26              3- For Rotate 180  -> we need  2     ms = 0XF830
+  27              4- For Rotate -90  -> we need  1.24  ms = 0XFB28
+  28              5- For Rotate -180 -> we need  0.98  ms = 0XFC2C
+  29            */
+  30          
+  31          void Timer0_Start(void)
+  32          {
+  33   1        EA   = 1;
+  34   1        TR0  = 1;
+  35   1      }
+  36          
+  37          void SERVO_init(void)
+  38          {
+  39   1        TMOD = 0X01;
+  40   1        TH0  = gTH0_value;
+  41   1        TL0  = gTL0_value;
+  42   1        ET0  = 1;
+  43   1      }
+  44          
+  45          void SERVO_rotateDegree(unsigned char TH0_value, unsigned char TL0_value)
+  46          {
+  47   1        gTH0_value = TH0_value;
+  48   1        gTL0_value = TL0_value;
+  49   1      } 
+  50          
+  51          void SERVO_ISR (void) interrupt 1 //timer value 
+  52          {
+  53   1          servo = ~servo;
+  54   1          TF0   = 0;
+C51 COMPILER V9.60.0.0   SERVO                                                             04/27/2024 19:01:54 PAGE 2   
+
+  55   1          TH0  = gTH0_value;
+  56   1          TL0  = gTL0_value;
+  57   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     36    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      2    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
