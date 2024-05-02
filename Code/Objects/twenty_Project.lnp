@@ -1,0 +1,13 @@
+".\Objects\STARTUP.obj",
+".\Objects\App.obj",
+".\Objects\lcd.obj",
+".\Objects\keypad.obj",
+".\Objects\servo.obj",
+".\Objects\IR_Sensor.obj",
+".\Objects\buzzer.obj",
+".\Objects\leds_and_buttons.obj",
+".\Objects\delay.obj",
+".\Objects\uart.obj" 
+TO ".\Objects\twenty_Project" 
+
+PRINT(".\Listings\twenty_Project.map")
